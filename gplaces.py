@@ -3,9 +3,8 @@ import simplejson
 
 class gPlaces(object):
     """
-    Implements methods to interact with the google places api
+    Implements methods to wrap google places api
     """
-    #AIzaSyBwX8lyMQntv4B_Mag-o7Cmn7-FXqXU_QU
     def __init__(self, apiKey):
         self.apiKey = apiKey
         self.baseurlbyradius = 'https://maps.googleapis.com/maps/api/place/search/{0}?key={1}&location={2},{3}&radius={4}&sensor={5}'
