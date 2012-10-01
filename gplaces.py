@@ -1,4 +1,5 @@
 import urllib2
+import urllib
 import simplejson
 
 class gPlaces(object):
@@ -7,23 +8,41 @@ class gPlaces(object):
     """
     def __init__(self, apiKey):
         self.apiKey = apiKey
-        self.baseurlbyradius = 'https://maps.googleapis.com/maps/api/place/search/{0}?key={1}&location={2},{3}&radius={4}&sensor={5}'
-        self.baseurlbyrank = 'https://maps.googleapis.com/maps/api/place/search/{0}?key={1}&location={2},{3}&rankby={4}&sensor={5}'
+        self.placesurl = 'https://maps.googleapis.com/maps/api/place/{0}/json?{1}'
         
+    def find(self, latitude, longitude, types=[], name="", radius= 5*1600, rankby="", sensor="false"):
+        paramdict = {}
+        paramdict['key'] = self.apiKey
+        paramdict['location'] = str(latitude) + ',' + str(longitude)
         
-    def getPlaces(self, latitude, longitude, radius="500", rankby="distance", sensor="false", outputformat="json"):
-        targeturl = self.baseurlbyradius.format(outputformat, self.apiKey, latitude, longitude, radius, sensor)
-        return self._queryurl(targeturl)
-    
-    def getPlacesbyrank(self, latitude, longitude, radius="500", rankby="distance", sensor="false", outputformat="json"):
-        targeturl = self.baseurlbyradius.format(outputformat, self.apiKey, latitude, longitude, rankby, sensor)
-        return self._queryurl(targeturl)
-    
+        if(len(rankby) > 0):
+            paramdict['rankby'] = rankby
+        else:
+            paramdict['radius'] = radius
+            
+        if(len(types) > 0):
+            paramdict["types"] ='|'.join(types)
+        
+        if(len(name) > 0):
+            paramdict["name"] = name
+        
+        paramdict['sensor'] = sensor
+        
+        url = self.placesurl.format("search", urllib.urlencode(paramdict))
+         
+        return self._queryurl(url)
+        
+    def details(self, reference, sensor="false"):
+        paramdict = {}
+        paramdict['key'] = self.apiKey
+        paramdict['reference'] = reference
+        paramdict['sensor'] = sensor
+        url = self.placesurl.format("details", urllib.urlencode(paramdict))
+        return self._queryurl(url)
+        
     def _queryurl(self, url):
         print "Querying: {0}".format(url)
         results = urllib2.urlopen(url).read();
-        return simplejson.loads(results)
-        
-        
+        return simplejson.loads(results)    
 
 
